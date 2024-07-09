@@ -18,17 +18,22 @@ public class Algorithms extends JPanel{
     Algorithms(){
         setBackground(Color.BLACK);
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        initBarHeight();
     }
 
     public void setSize(int size){
         this.SIZE = size;
+        BAR_WIDTH = (float) WIDTH / SIZE;
+        BAR_HEIGHT= new float[SIZE];
+        initBarHeight();
+        repaint();
     }
 
     int getSIZE(){
         return SIZE;
     }
 
-    // @Override
+    @Override
     public void paintComponent(Graphics graphics){
         super.paintComponent(graphics);
 
@@ -37,41 +42,45 @@ public class Algorithms extends JPanel{
         Rectangle2D.Float bar;
 
         for(int i = 0; i < getSIZE(); i++){
-            bar = new Rectangle2D.Float(i * BAR_WIDTH, 0, BAR_WIDTH - 1, BAR_HEIGHT[i]);
+            bar = new Rectangle2D.Float(i * BAR_WIDTH, HEIGHT - BAR_HEIGHT[i], BAR_WIDTH - 1, BAR_HEIGHT[i]);
             graphics2d.fill(bar);
         }
-        bar = new Rectangle2D.Float(current_element * BAR_WIDTH, 0, BAR_WIDTH - 1, BAR_HEIGHT[current_element]);
-        graphics2d.fill(bar);
-        graphics2d.setColor(Color.RED);
+        if (current_element < getSIZE() && traversing_element < getSIZE()) {
+            graphics2d.setColor(Color.RED);
+            bar = new Rectangle2D.Float(current_element * BAR_WIDTH, HEIGHT - BAR_HEIGHT[current_element], BAR_WIDTH, BAR_HEIGHT[current_element]);
+            graphics2d.fill(bar);
 
-        bar = new Rectangle2D.Float(traversing_element * BAR_WIDTH, 0, BAR_WIDTH - 1, BAR_HEIGHT[traversing_element]);
-        graphics2d.fill(bar);
-        graphics2d.setColor(Color.YELLOW);
+            graphics2d.setColor(Color.YELLOW);
+            bar = new Rectangle2D.Float(traversing_element * BAR_WIDTH, HEIGHT - BAR_HEIGHT[traversing_element], BAR_WIDTH, BAR_HEIGHT[traversing_element]);
+            graphics2d.fill(bar);
+        }
+
     }
 
-    public void insertionSort(){
-        sorter = new SwingWorker<Void, Void>(){
-
-            public Void doInBackground() throws InterruptedException{
-                for(current_element = 1; current_element < getSIZE(); current_element++){
-                    traversing_element = current_element;
-                    while(traversing_element > 0 && BAR_HEIGHT[traversing_element] < BAR_HEIGHT[traversing_element - 1]){
-                        swap(traversing_element, traversing_element - 1);
-                        traversing_element--;
-
-                        repaint();
-                    }
+public void insertionSort() {
+    sorter = new SwingWorker<Void, Void>() {
+        @Override
+        public Void doInBackground() throws InterruptedException {
+            for (current_element = 1; current_element < getSIZE(); current_element++) {
+                traversing_element = current_element;
+                float key = BAR_HEIGHT[traversing_element];
+                int j = traversing_element - 1;
+                while (j >= 0 && BAR_HEIGHT[j] > key) {
+                    BAR_HEIGHT[j + 1] = BAR_HEIGHT[j];
+                    j = j - 1;
+                    repaint();
+                    Thread.sleep(10);
                 }
-                current_element = 0;
-                traversing_element = 0;
-                return null;
-
+                BAR_HEIGHT[j + 1] = key;
+                repaint();
+                Thread.sleep(10);
             }
-
-
-        };
-    }
-
+            current_element = 0;
+            traversing_element = 0;
+            return null;
+        }
+    };
+}
     public void bubbleSort(){
         sorter = new SwingWorker<Void,Void>() {
             @Override
@@ -81,7 +90,7 @@ public class Algorithms extends JPanel{
                         if(BAR_HEIGHT[traversing_element - 1] > BAR_HEIGHT[traversing_element]){
                             swap(traversing_element, traversing_element - 1);
                             traversing_element--;
-
+                            Thread.sleep(10);
                             repaint();
                         }
                     }
@@ -91,6 +100,7 @@ public class Algorithms extends JPanel{
                     return null;
             }
         };
+
     }
 
     public void mergerSort(){
@@ -102,7 +112,7 @@ public class Algorithms extends JPanel{
                         if(BAR_HEIGHT[traversing_element - 1] > BAR_HEIGHT[traversing_element]){
                             swap(traversing_element, traversing_element - 1);
                             traversing_element--;
-
+                            Thread.sleep(10);
                             repaint();
                         }
                     }
@@ -127,6 +137,7 @@ public class Algorithms extends JPanel{
                         }
                     }
                     swap(current_element, min_index);
+                    Thread.sleep(10);
                     repaint();
                 }
                 current_element = 0;

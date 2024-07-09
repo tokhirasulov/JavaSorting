@@ -1,51 +1,96 @@
 package id;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class Main extends JFrame {
-    static JMenuBar menuBar;
-    static JMenu algorithMenu, helpMenu;
-    static JMenuItem algorithm2, help1;
+    Algorithms algo = new Algorithms();
 
-    Main() {
-        // Initialize components
-        menuBar = new JMenuBar();
-        algorithMenu = new JMenu("Menu");
-        helpMenu = new JMenu("Help");
-        algorithm2 = new JMenuItem("Sorting Techniques");
-        help1 = new JMenuItem("How it works");
+    JPanel pPanel1, pPanel2;
 
-        // Add menu items to menus
-        algorithMenu.add(algorithm2);
-        helpMenu.add(help1);
+    JButton jbtRandomize, jbtMerge, jbtBubble, jbtInsertion, jbtSelection, jbtStart;
 
-        // Add menus to menu bar
-        menuBar.add(algorithMenu);
-        menuBar.add(helpMenu);
+    JProgressBar jb1;
 
-        // Create listener and add it to menu items
+    JSlider slider = new JSlider(0, 100, 2);
+
+    public Main(){
+        pPanel1 = new JPanel();
+        pPanel1.setLayout(new GridLayout(1, 7));
+        pPanel1.setBackground(Color.CYAN);
+        pPanel2 = new JPanel();
+        pPanel2.setLayout(new BorderLayout());
+
+        jbtRandomize = new JButton("Randomize");
+        jbtMerge = new JButton("Merge Sort");
+        jbtBubble = new JButton("Bubble Sort");
+        jbtInsertion = new JButton("Insertion Sort");
+        jbtSelection = new JButton("Selection");
+        jbtStart = new JButton("Start");
+
+        jbtStart.setBackground(Color.GREEN);
+
+        pPanel1.add(jbtRandomize);
+        pPanel1.add(jbtMerge);pPanel1.add(jbtBubble);pPanel1.add(jbtInsertion);pPanel1.add(jbtSelection);
+
+        pPanel1.add(slider, BorderLayout.WEST);
+        pPanel2.add(algo, BorderLayout.CENTER);
+
         ListenerClass listener = new ListenerClass();
-        algorithm2.addActionListener(listener);
-        help1.addActionListener(listener);
+        jbtRandomize.addActionListener(listener);
+        jbtMerge.addActionListener(listener);
+        jbtBubble.addActionListener(listener);
+        jbtInsertion.addActionListener(listener);
+        jbtSelection.addActionListener(listener);
+        jbtStart.addActionListener(listener);
 
-        // Set the menu bar for the frame
-        setJMenuBar(menuBar);
+        slider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event){
+                int value = slider.getValue();
+                algo.setSize(value);
+                algo.BAR_WIDTH = (float)800 / algo.getSIZE();
+                algo.repaint();
+            }
+        });
 
-        // Set frame properties
-        setTitle("Project 2024 by Tokhir Rasulov");
-        setSize(700, 500);
-        setLocation(200, 100);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        add(pPanel1, BorderLayout.NORTH);
+        add(pPanel2, BorderLayout.CENTER);
+
+        setTitle("Sorting Techniques");
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
+
+    }
+    class ListenerClass implements ActionListener {
+        public void actionPerformed(ActionEvent e){
+            if(e.getSource() == jbtRandomize){
+                algo.initShuffleBar();
+            }else if(e.getSource() == jbtMerge){
+                algo.mergerSort();
+                algo.initShuffleBar();
+            }else if(e.getSource() == jbtSelection){
+                algo.selectionSort();
+                algo.initShuffleBar();
+            }else if(e.getSource() == jbtInsertion){
+                algo.insertionSort();
+                algo.initShuffleBar();
+            }else if(e.getSource() == jbtBubble){
+                algo.bubbleSort();
+                algo.initShuffleBar();
+            }else if(e.getSource() == jbtStart){
+                System.out.println("Start button is clicked");
+            }
+        }
     }
 
-    class ListenerClass implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            // Log the action event source
-            System.out.println("Action event source: " + e.getSource());
-
-            // Here you can implement additional actions when a menu item is clicked
-            setVisible(false);
-        }
-    }}
+}
