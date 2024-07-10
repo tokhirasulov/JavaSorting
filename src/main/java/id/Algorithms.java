@@ -2,6 +2,10 @@ package id;
 
 import java.awt.*;
 import java.awt.geom.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.*;
@@ -79,7 +83,12 @@ public void insertionSort() {
             traversing_element = 0;
             return null;
         }
+        @Override
+        protected void done(){
+            repaint();
+        }
     };
+    sorter.execute();
 }
     public void bubbleSort(){
         sorter = new SwingWorker<Void,Void>() {
@@ -99,30 +108,95 @@ public void insertionSort() {
                     traversing_element = 0;
                     return null;
             }
+            @Override
+            protected void done(){
+                repaint();
+            };
         };
-
+        sorter.execute();
     }
+
 
     public void mergerSort(){
         sorter = new SwingWorker<Void,Void>() {
             @Override
             public Void doInBackground() throws InterruptedException{
-                for(current_element = 0; current_element < getSIZE(); current_element++){
-                    for(traversing_element = 1; traversing_element < (getSIZE() - current_element); traversing_element++){
-                        if(BAR_HEIGHT[traversing_element - 1] > BAR_HEIGHT[traversing_element]){
-                            swap(traversing_element, traversing_element - 1);
-                            traversing_element--;
-                            Thread.sleep(10);
-                            repaint();
-                        }
-                    }
-                }
+               BAR_HEIGHT = mergeSortHelper(BAR_HEIGHT, 0);
+                return null;
+
+            }
+            @Override
+            protected void done(){
                 current_element = 0;
                 traversing_element = 0;
-
-                return null;
+                repaint();
             }
         };
+        sorter.execute();
+    }
+
+    private float[] mergeSortHelper(float[] array, int baseIndex) throws InterruptedException {
+        if (array.length <= 1) {
+            return array;
+        }
+        int middle = array.length / 2;
+        float[] left = Arrays.copyOfRange(array, 0, middle);
+        float[] right = Arrays.copyOfRange(array, middle, array.length);
+
+        float[] sortedLeft = mergeSortHelper(left, baseIndex);
+        float[] sortedRight = mergeSortHelper(right, baseIndex + middle);
+
+        return merge(sortedLeft, sortedRight, baseIndex);
+    }
+
+    private float[] merge(float[] left, float[] right, int baseIndex) throws InterruptedException {
+        float[] result = new float[left.length + right.length];
+        int leftIndex = 0;
+        int rightIndex = 0;
+        int elementsInResult = 0;
+
+        while (leftIndex < left.length && rightIndex < right.length) {
+            if (left[leftIndex] < right[rightIndex]) {
+                result[elementsInResult] = left[leftIndex];
+                current_element = baseIndex + elementsInResult;
+                traversing_element = baseIndex + leftIndex;
+                leftIndex++;
+            } else {
+                result[elementsInResult] = right[rightIndex];
+                current_element = baseIndex + elementsInResult;
+                traversing_element = baseIndex + rightIndex + left.length;
+                rightIndex++;
+            }
+            elementsInResult++;
+            repaint();
+            Thread.sleep(10);
+        }
+
+        while (leftIndex < left.length) {
+            result[elementsInResult] = left[leftIndex];
+            current_element = baseIndex + elementsInResult;
+            traversing_element = baseIndex + leftIndex;
+            leftIndex++;
+            elementsInResult++;
+            repaint();
+            Thread.sleep(10);
+        }
+
+        while (rightIndex < right.length) {
+            result[elementsInResult] = right[rightIndex];
+            current_element = baseIndex + elementsInResult;
+            traversing_element = baseIndex + rightIndex + left.length;
+            rightIndex++;
+            elementsInResult++;
+            repaint();
+            Thread.sleep(10);
+        }
+
+        for (int i = 0; i < result.length; i++) {
+            BAR_HEIGHT[baseIndex + i] = result[i];
+        }
+
+        return result;
     }
 
     public void selectionSort(){
@@ -143,8 +217,14 @@ public void insertionSort() {
                 current_element = 0;
                 traversing_element = 0;
                 return null;
+
+            }
+            @Override
+            protected void done(){
+                repaint();
             }
         };
+        sorter.execute();
     }
 
     public void initShuffleBar(){
